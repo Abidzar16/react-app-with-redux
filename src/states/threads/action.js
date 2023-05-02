@@ -54,7 +54,7 @@ function upvoteThreadActionCreator({ threadId, userId }) {
 
 function downvoteThreadActionCreator({ threadId, userId }) {
   return {
-    type: ActionType.UPVOTE_THREAD,
+    type: ActionType.DOWNVOTE_THREAD,
     payload: {
       threadId,
       userId,
@@ -64,7 +64,7 @@ function downvoteThreadActionCreator({ threadId, userId }) {
 
 function neutralvoteThreadActionCreator({ threadId, userId }) {
   return {
-    type: ActionType.UPVOTE_THREAD,
+    type: ActionType.NEUTRALVOTE_THREAD,
     payload: {
       threadId,
       userId,
@@ -72,7 +72,7 @@ function neutralvoteThreadActionCreator({ threadId, userId }) {
   };
 }
 
-function asyncAddThread({ title = '', body = '', category }) {
+function asyncAddThread({ title = '', body = '', category = '' }) {
   return async (dispatch) => {
     dispatch(showLoading());
     try {
@@ -85,18 +85,54 @@ function asyncAddThread({ title = '', body = '', category }) {
   };
 }
 
-function asyncToogleLikeThread(threadId) {
+function asyncUpvoteThread(threadId) {
   return async (dispatch, getState) => {
     dispatch(showLoading());
 
     const { authUser } = getState();
-    dispatch(toggleLikeThreadActionCreator({ threadId, userId: authUser.id }));
+    dispatch(upvoteThreadActionCreator({ threadId, userId: authUser.id }));
 
     try {
-      await dicodingAPI.toggleLikeThread(threadId);
+      await dicodingAPI.upVoteThread(threadId);
     } catch (error) {
       alert(error.message);
-      dispatch(toggleLikeThreadActionCreator({ threadId, userId: authUser.id }));
+      dispatch(upvoteThreadActionCreator({ threadId, userId: authUser.id }));
+    }
+
+    dispatch(hideLoading());
+  };
+}
+
+function asyncDownvoteThread(threadId) {
+  return async (dispatch, getState) => {
+    dispatch(showLoading());
+
+    const { authUser } = getState();
+    dispatch(downvoteThreadActionCreator({ threadId, userId: authUser.id }));
+
+    try {
+      await dicodingAPI.downVoteThread(threadId);
+    } catch (error) {
+      alert(error.message);
+      dispatch(downvoteThreadActionCreator({ threadId, userId: authUser.id }));
+    }
+
+    dispatch(hideLoading());
+  };
+}
+
+function asyncNeutralvoteThread(threadId) {
+  return async (dispatch, getState) => {
+    dispatch(showLoading());
+
+    const { authUser } = getState();
+    dispatch(neutralvoteThreadActionCreator({ threadId, userId: authUser.id }));
+
+    try {
+      await dicodingAPI.neutralVoteThread(threadId);
+    } catch (error) {
+      alert(error.message);
+      dispatch(neutralvoteThreadActionCreator({ threadId, userId: authUser.id }));
     }
 
     dispatch(hideLoading());
@@ -107,7 +143,11 @@ export {
   ActionType,
   receiveThreadsActionCreator,
   addThreadActionCreator,
-  toggleLikeThreadActionCreator,
+  upvoteThreadActionCreator,
+  downvoteThreadActionCreator,
+  neutralvoteThreadActionCreator,
   asyncAddThread,
-  asyncToogleLikeThread,
+  asyncUpvoteThread,
+  asyncDownvoteThread,
+  asyncNeutralvoteThread,
 };
